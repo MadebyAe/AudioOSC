@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+  	html{background: #000;cursor: crosshair}
+	</style>
+</head>
+<body>
+	<script>
+  	window.onload = function() {
+
+    var audio = new window.webkitAudioContext(),
+    position = 0,
+    scale = {
+        a: 100,
+        b: 80,
+        c: 50,
+        d: 20,
+        e: 329.63
+    },
+    song = "baaa--a-aaaa-a-a-ad---a-c-c-c-cc";
+
+    setInterval(play, 1000 / 8);
+
+    function createOscillator(freq) {
+        var attack = 50,
+            decay = 500,
+            gain = audio.createGain(),
+            osc = audio.createOscillator(),
+            h = window.innerHeight;
+
+        gain.connect(audio.destination);
+        gain.gain.setValueAtTime(0, audio.currentTime);
+        gain.gain.linearRampToValueAtTime(1, audio.currentTime + attack / 1000);
+        gain.gain.linearRampToValueAtTime(0, audio.currentTime + decay / 1000);
+
+        osc.frequency.value = freq;
+        osc.type = "square";
+        osc.connect(gain);
+        osc.start(0);
+        
+        document.addEventListener("mousemove", function(e) {
+          osc.frequency.value = e.clientY / h * 1000;
+        });
+        
+        setTimeout(function() {
+            osc.stop(0);
+            osc.disconnect(gain);
+            gain.disconnect(audio.destination);
+            console.log('tin');
+        }, decay)
+        
+        
+    }
+
+    function play() {
+        var note = song.charAt(position),
+            freq = scale[note];
+        position += 1;
+        if(position >= song.length) {
+            position = 0;
+        }
+        if(freq) {
+            createOscillator(freq);
+        }
+    }
+    
+    
+};
+	</script>
+</body>
+</html>
